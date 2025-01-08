@@ -32,28 +32,50 @@ UserRouter.post('/login', async (req, res) => {
     try{
         // Check if user exists
         const user = await UserModel.findOne({username});
+        console.log(user)
         if(!user){
-            res.send('User not found');
+            console.log("user not found")
+            return res.status(404).json({ message: 'User not found' });
         }
          // Compare the password
          const isMatch = await bcrypt.compare(password, user.password);
          if (!isMatch) {
+            console.log('Invalid username or password');
              return res.status(400).json({ message: "Invalid username or password" });
          }
 
          const token = jwt.sign({ id: user._id },process.env.JWT, { expiresIn: "1h" });
+        
+        res.cookie('token', token, { httpOnly: true });
+        console.log(token)
          return res.status(200).json({ message: "User signed in successfully", token });
         }catch (error) {
             return res.status(500).json({ message: "Error signing in user", error });
         }
 });
 
+UserRouter.get('/gender',authMiddleware, async (req, res) => {
+    try {
+        console.log("me at gender",req.user)
+        const user = await UserModel.findById(req.user);
+        if (!user) {
+            return res.status(404).send({ error: 'User not found' });
+        }
+        console.log("gender ",user.gender)
+        res.send({ gender: user.gender });
+    } catch (error) {
+        res.status(500).send({ error: 'Internal server error' });
+    }
+});
 
 UserRouter.get('/profile',authMiddleware, async (req, res) => {
     console.log("profile")
     return res.status(200).json({ message: "User profile in successfully" });
 
 })
+
+
+
 
 UserRouter.get('/match', authMiddleware, async (req, res) => {
     try {

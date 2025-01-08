@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const connectToDatabase = async () => {
   try {
-    const uri = "mongodb+srv://admin:root@cluster0.uj7tu.mongodb.net/chat"; // Replace with your MongoDB URI
+    const uri = "mongodb://localhost:27017/chat"; // Replace with your MongoDB URI
     await mongoose.connect(uri);
     console.log("Connected to MongoDB successfully!");
   } catch (error) {
